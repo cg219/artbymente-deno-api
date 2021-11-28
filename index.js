@@ -1,4 +1,4 @@
-import 'https://deno.land/x/dotenv@v3.1.0/load.ts';
+// import 'https://deno.land/x/dotenv@v3.1.0/load.ts';
 import { getEntries } from './contentful.js';
 import { addToList, sendEmail } from './sendgrid.js';
 import { serve } from 'https://deno.land/std@0.116.0/http/server.ts';
