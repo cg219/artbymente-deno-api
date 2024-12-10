@@ -16,6 +16,12 @@ async function handler(req: Request) {
     const url = new URL(req.url);
     const res: Reply = { status: 200, data: null };
 
+    if (req.method == 'OPTIONS') {
+        return new Response("", {
+            headers: { 'Access-Control-Allow-Origin': "*" }
+        })
+    }
+
     if (req.method == 'GET') {
         switch(url.pathname) {
             case `/api/artworks/${url.pathname.slice('/api/artworks/'.length)}`: {
