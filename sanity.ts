@@ -15,6 +15,8 @@ const client = createClient({
 })
 
 function transformData(data: any) {
+    if (!data) return null
+
     return {
         title: data.title,
         tags: data.tags,
@@ -40,7 +42,7 @@ export async function getArtwork(slug: string) {
     "related": *[_type == "artwork" && tags match ^.tags][0...${LIMIT}]{ nsfw, "slug": slug.current, "image": image.asset->{url}}
 }| order(date asc)[0]`)
 
-    if (art.related && art.related.length < LIMIT) {
+    if (art && art.related.length < LIMIT) {
         const ignore = art.related.map((d: { slug: string }) => d.slug);
 
         ignore.push(art.slug);

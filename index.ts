@@ -22,6 +22,7 @@ async function handler(req: Request) {
                 const id = url.pathname.slice('/api/artworks/'.length);
 
                 res.data = await getArtwork(id)
+                if (!res.data) res.status = 404;
                 return reply(res);
             }
             case '/api/artworks': {
