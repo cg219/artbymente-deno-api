@@ -2,6 +2,7 @@ import { addToList, sendEmail } from './sendgrid.ts';
 import { getArtworks, getArtwork } from './sanity.ts';
 import { Hono } from '@hono/hono'
 import { trimTrailingSlash } from '@hono/hono/trailing-slash'
+import { cors } from '@hono/hono/cors';
 
 type Reply = {
     status: number
@@ -16,6 +17,7 @@ function reply(data: Reply = { status: 404, data: { message: 'Resource Not Found
 
 const api = new Hono()
 
+api.use("/api/*", cors())
 api.use(trimTrailingSlash())
 api.get("/api/artworks", async (c) => {
     const res: Reply = { status: 200, data: null };
