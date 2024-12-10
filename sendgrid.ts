@@ -3,9 +3,9 @@ const sendgrid = {
     request: 'https://sendgrid.com/v3'
 }
 
-let listId;
+let listId: string;
 
-export async function addToList({ email, name } = {}) {
+export async function addToList(name: string, email: string) {
     if (!listId) {
         const req = `${sendgrid.request}/marketing/lists`;
         const response = await fetch(req, {
@@ -17,7 +17,7 @@ export async function addToList({ email, name } = {}) {
 
         const lists = await response.json();
 
-        listId = lists.result.find((list) => list.name == 'Artbymente')?.id;
+        listId = lists.result.find((list: any) => list.name == 'Artbymente')?.id;
         console.log(listId);
     }
 
@@ -41,7 +41,7 @@ export async function addToList({ email, name } = {}) {
     return await response.json();
 }
 
-export async function sendEmail({ name, email, message } = {}) {
+export async function sendEmail(name: string, email: string, message: string) {
     const req = `${sendgrid.request}/mail/send`;
     const body = {
         from: { email: Deno.env.get('SENDING_EMAIL') },
@@ -56,7 +56,7 @@ export async function sendEmail({ name, email, message } = {}) {
         }]
     }
 
-    const response = await fetch(req, {
+    await fetch(req, {
         headers: {
             'Authorization': `Bearer ${sendgrid.apiToken}`,
             'Content-Type': 'application/json'
