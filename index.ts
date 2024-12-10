@@ -1,5 +1,7 @@
 import { addToList, sendEmail } from './sendgrid.ts';
 import { getArtworks, getArtwork } from './sanity.ts';
+import { Hono } from '@hono/hono'
+import { trimTrailingSlash } from '@hono/hono/trailing-slash'
 
 type Reply = {
     status: number
@@ -12,71 +14,64 @@ function reply(data: Reply = { status: 404, data: { message: 'Resource Not Found
     })
 }
 
-async function handler(req: Request) {
-    const url = new URL(req.url);
+const api = new Hono()
+
+api.use(trimTrailingSlash())
+api.get("/api/artworks", async (c) => {
     const res: Reply = { status: 200, data: null };
 
-    if (req.method == 'OPTIONS') {
-        return new Response("", {
-            headers: { 'Access-Control-Allow-Origin': "*" }
-        })
-    }
+    res.data = await getArtworks()
+    return c.json(res);
+})
 
-    if (req.method == 'GET') {
-        switch(url.pathname) {
-            case `/api/artworks/${url.pathname.slice('/api/artworks/'.length)}`: {
-                const id = url.pathname.slice('/api/artworks/'.length);
+api.get("/api/artworks/:slug", async (c) => {
+    const res: Reply = { status: 200, data: null };
+    const slug = c.req.param("slug")
 
-                res.data = await getArtwork(id)
-                if (!res.data) res.status = 404;
-                return reply(res);
-            }
-            case '/api/artworks': {
-                res.data = await getArtworks()
-                return reply(res)
-            }
+    res.data = await getArtwork(slug)
+    if (!res.data) res.status = 404;
+    return c.json(res);
+})
+
+api.post("/api/newsletter", async (c) => {
+    const res: Reply = { status: 200, data: null };
+
+    try {
+        const { name, email } = await c.req.json();
+
+        if (!name || !email) {
+            res.status = 400;
+            res.data = {
+                message: 'Invalid or Missing Values'
+            };
+
+            return c.json(res)
         }
-    }
 
-    if (req.method == 'POST') {
-        switch(url.pathname) {
-            case '/api/newsletter': {
-                try {
-                    const { name, email } = await req.json();
+        await addToList(name, email);
+        return c.json(res);
+    } catch (_) { return c.json({})}
 
-                    if (!name || !email) {
-                        res.status = 400;
-                        res.data = {
-                            message: 'Invalid or Missing Values'
-                        };
-                        break;
-                    }
+})
 
-                    await addToList({ email, name });
-                    return reply(res);
-                } catch (_) { return reply() }
-            }
-            case '/api/email': {
-                try {
-                    const { name, email, message } = await req.json();
+api.post("/api/email", async (c) => {
+    const res: Reply = { status: 200, data: null };
 
-                    if (!name || !email || !message) {
-                        res.status = 400;
-                        res.data = {
-                            message: 'Invalid or Missing Values'
-                        };
-                        break;
-                    }
+    try {
+        const { name, email, message } = await c.req.json();
 
-                    await sendEmail({ email, name, message });
-                    return reply(res);
-                } catch (_) { return reply() }
-            }
+        if (!name || !email || !message) {
+            res.status = 400;
+            res.data = {
+                message: 'Invalid or Missing Values'
+            };
+
+            return c.json(res)
         }
-    }
 
-    return reply();
-}
+        await sendEmail(email, name, message);
+        return c.json(res);
+    } catch (_) { return c.json({}) }
+})
 
-console.log('Listening...');
-Deno.serve(handler)
+Deno.serve(api.fetch);

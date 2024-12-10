@@ -1,11 +1,15 @@
 {
   "version": "4",
   "specifiers": {
+    "jsr:@hono/hono@^4.6.13": "4.6.13",
     "jsr:@std/assert@1": "1.0.9",
     "jsr:@std/internal@^1.0.5": "1.0.5",
     "npm:@sanity/client@^6.24.1": "6.24.1"
   },
   "jsr": {
+    "@hono/hono@4.6.13": {
+      "integrity": "198970fc6facf71a88ee57aa1ed32143b56bcb0f842fa965ca3ee7d6fdd21a8e"
+    },
     "@std/assert@1.0.9": {
       "integrity": "a9f0c611a869cc791b26f523eec54c7e187aab7932c2c8e8bea0622d13680dcd",
       "dependencies": [
@@ -182,6 +186,7 @@
   },
   "workspace": {
     "dependencies": [
+      "jsr:@hono/hono@^4.6.13",
       "jsr:@std/assert@1",
       "npm:@sanity/client@^6.24.1"
     ]

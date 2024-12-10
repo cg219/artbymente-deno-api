@@ -3,6 +3,7 @@
     "dev": "deno run --watch -A index.ts"
   },
   "imports": {
+    "@hono/hono": "jsr:@hono/hono@^4.6.13",
     "@sanity/client": "npm:@sanity/client@^6.24.1",
     "@std/assert": "jsr:@std/assert@1"
   }
