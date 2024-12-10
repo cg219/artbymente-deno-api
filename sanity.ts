@@ -40,13 +40,13 @@ export async function getArtwork(slug: string) {
     "related": *[_type == "artwork" && tags match ^.tags][0...${LIMIT}]{ nsfw, "slug": slug.current, "image": image.asset->{url}}
 }| order(date asc)[0]`)
 
-    if (art.related.length < LIMIT) {
-        const ignore = art.related.map((d) => d.slug);
+    if (art.related && art.related.length < LIMIT) {
+        const ignore = art.related.map((d: { slug: string }) => d.slug);
 
         ignore.push(art.slug);
 
         const limit = LIMIT - [...new Set(ignore)].length;
-        const preparedIgnore = ignore.map((d) => `"${d}"`).join(", ")
+        const preparedIgnore = ignore.map((d: string) => `"${d}"`).join(", ")
         const related = await client.fetch(`*[_type == "artwork" && !(slug.current in [${preparedIgnore}])][0...${limit}]{ nsfw, "slug": slug.current, "image": image.asset->{url}}`)
 
         art.related = [...art.related, ...related]
@@ -61,5 +61,5 @@ export async function getArtworks() {
     "slug": slug.current,
     "image": image.asset->{url}
 }| order(date desc)`)
-    return art.map((d) => transformData(d))
+    return art.map((d: any) => transformData(d))
 }
